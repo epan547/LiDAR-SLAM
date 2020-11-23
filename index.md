@@ -1,4 +1,4 @@
-## LiDAR SLAM Implementation for Neatos from Home
+## LiDAR SLAM Themes for Neato Quarantines
 
 Eamon O'Brien and Emma Pan
 Comprobo 2020
