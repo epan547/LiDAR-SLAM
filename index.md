@@ -19,7 +19,7 @@ As we suspected, working with the physical neato onvolved debugging many more ob
 
 While this was a frustrating process, it was productive in that we got practice working with actual robotics hardware, which was a learning goal for both of us in this project. One very fun outcome is that we have already been able to map our house with the neato using the built in SLAM algorithm from the [particle filter](https://viahtml3.hypothes.is/proxy/https://comprobo20.github.io/assignments/robot_localization?via.client.openSidebar=1&via.client.requestConfigFromFrame.origin=https%3A%2F%2Flms.hypothes.is&via.client.requestConfigFromFrame.ancestorLevel=2&via.external_link_mode=new-tab) project. 
 
-<img src="images/upstairs.png">
+![image-of-upstairs-scan](upstairs.png)
 
 Once the robot was functional, we attempted to begin work on the graph optimization SLAM, but quickly hit another bug installing [G2opy](https://github.com/uoip/g2opy). After a great deal of fiddling with libraries and dependencies, we decided to look for a different library. We found [another](https://pypi.org/project/graphslam/) python wrapper for graph optimization which was much more recently updated, and also had robust documentation. This library was quite simple to install.
 
