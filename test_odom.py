@@ -21,6 +21,7 @@ from tf import TransformBroadcaster
 from tf.transformations import euler_from_quaternion, rotation_matrix, quaternion_from_matrix
 from helper_functions import TFHelper
 
+# Should give us a rotation and translation. Delta x, delta y, delta theta
 from icp.icp import icp
 
 from graphslam.edge.edge_odometry import EdgeOdometry
@@ -43,20 +44,59 @@ def save_data(node):
 
 def exit_handler(node):
     """
-    This function is called after
+    This function is called after the
     """
     save_data(node)
-    fig = plt.figure()
-    for i in range(len(node.map_x)):
-        plt.scatter(node.map_x[i], node.map_y[i], color='b', alpha=0.3)
-    plt.scatter(node.map_neatox, node.map_neatoy, color='r')
-    plt.scatter(node.map_neatox[0], node.map_neatoy[0], color='y')
+    plot_transform(node)
+    # fig = plt.figure()
+    # for i in range(len(node.map_x)):
+    #     plt.scatter(node.map_x[i], node.map_y[i], color='b', alpha=0.3)
+    # plt.scatter(node.map_neatox, node.map_neatoy, color='r')
+    # plt.scatter(node.map_neatox[0], node.map_neatoy[0], color='y')
+
+def plot_transform(node):
+    # Plot the original scan at beginning and end of loop closure
+    fig, ax = plt.subplots(nrows=1, ncols=2, squeeze=False)
+    ax[0][0].scatter(node.map_x[0], node.map_y[0])
+    ax[0][0].scatter(node.map_x[node.index_saved], node.map_y[node.index_saved])
+
+    # Calculate the transform for the old scan
+    res_old = apply_transform(node.old_scan, node)
+
+    # Plot the transformed start scan over the original loop closure scan
+    # TODO: Flip so it transforms the new scan instead
+    ax[0][1].scatter(res_old[0], res_old[1])
+    ax[0][1].scatter(node.map_x[node.index_saved], node.map_y[node.index_saved])
+
+    # Add titles to the subplots
+    ax[0][0].title.set_text('Original Loop Closure Scans')
+    ax[0][1].title.set_text('After ICP Transform')
     plt.show()
+
     time.sleep(5)
     plt.close()
 
+def apply_transform(scan, node):
+    # Calculate the transformed scan
+    # Make C a homogeneous representation of B (later scan)
+    C = np.ones((len(scan), 3))
+    C[:,0:2] = scan
+    print("Before transform", C.shape)
+
+    # Transform C
+    C = np.dot(node.transform, C.T).T
+    print("After transform", C.shape)
+    res = np.rot90(C, 3)
+    print(res.shape)
+    print(res[0])
+    print(res[1])
+    print(res[2])
+    return res
+
 class NeatoController():
-    "This class encompasses multiple behaviors for the simulated neato"
+    """
+    This class encompasses multiple behaviors for the simulated neato
+    """
     def __init__(self):
         rospy.init_node('finite_state')
         self.distance_threshold = 0.8
@@ -70,7 +110,7 @@ class NeatoController():
         self.angular_k = .005
         self.vel_msg = Twist()
         self.vel_pub = rospy.Publisher('cmd_vel', Twist, queue_size=10)
-        rospy.Subscriber('stable_scan', LaserScan, self.process_scan)
+        # rospy.Subscriber('stable_scan', LaserScan, self.process_scan)
         rospy.Subscriber('projected_stable_scan', PointCloud2, self.projected_scan_received)
         rospy.Subscriber('odom', Odometry, self.process_odom)
         # Initializing user input
@@ -94,6 +134,10 @@ class NeatoController():
         self.init_y = None
         self.init_z = None
         self.starting_threshold = 0.1
+        self.transform = None
+        self.index_saved = 0
+        self.old_scan = []
+        self.new_scan = []
 
 
     def run(self):
@@ -173,28 +217,6 @@ class NeatoController():
         #print("X position: ", self.x, "\n Y position: ", self.y)
         self.state = "teleop"
 
-    def process_scan(self, msg):
-        pass
-        # wait a little while to see if the transform becomes available.  This fixes a race
-        # condition where the scan would arrive a little bit before the odom to base_link transform
-        # was updated.
-        # self.tf_listener.waitForTransform(self.base_frame, msg.header.frame_id, msg.header.stamp, rospy.Duration(0.5))
-        # # calculate pose of laser relative to the robot base
-        # p = PoseStamped(header=Header(stamp=rospy.Time(0),
-        #                               frame_id=msg.header.frame_id))
-        # laser_pose = self.tf_listener.transformPose(self.base_frame, p)
-        # print(laser_pose)
-        # #print(self.laser_pose.pose.position)
-        # #print(self.laser_pose)
-        # print(msg.header.stamp)
-        # angles = np.linspace(0, 2*math.pi, num=361)
-        # for i,point in enumerate(msg.ranges):
-        #     if point != 0:
-        #         x = point * np.cos(angles[i])
-        #         y = point * np.sin(angles[i])
-        #         self.map_x.append(x - self.x)
-        #         self.map_y.append(y - self.y)
-
     def projected_scan_received(self, msg):
         current_mapx = []
         current_mapy = []
@@ -230,10 +252,13 @@ class NeatoController():
         if distance < self.starting_threshold and self.moved_flag:
             print('Oh boy thats a loop closure')
             self.moved_flag = False
-            old_scan = np.array((self.map_x[0], self.map_y[0]))
-            new_scan = np.array((self.map_x[-1],self.map_y[-1]))
-            t,d,i = icp(old_scan,new_scan)
-            print(t.shape)
+            self.index_saved = len(self.map_x)-1
+            # Both scans should be in format: (361,2)
+            self.old_scan = np.rot90(np.array((self.map_x[0], self.map_y[0])))
+            self.new_scan = np.rot90(np.array((self.map_x[-1],self.map_y[-1])))
+            # Use ICP to get 3x3 transformation matrix
+            t,d,i = icp(self.old_scan,self.new_scan)
+            node.transform = t
 
     def origin(self):
         if self.linear_error < 1:
