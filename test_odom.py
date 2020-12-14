@@ -21,14 +21,34 @@ from tf import TransformBroadcaster
 from tf.transformations import euler_from_quaternion, rotation_matrix, quaternion_from_matrix
 from helper_functions import TFHelper
 
+from icp.icp import icp
+
+from graphslam.edge.edge_odometry import EdgeOdometry
+from graphslam.graph import Graph
+from graphslam.pose.r2 import PoseR2
+from graphslam.pose.r3 import PoseR3
+from graphslam.pose.se2 import PoseSE2
+from graphslam.pose.se3 import PoseSE3
+from graphslam.vertex import Vertex
+
+
+def save_data(node):
+    """
+    This function saves data from projected stable laser scans and neato positional data from odom to file.
+    """
+    np.savetxt("map.csv",
+           ((node.map_x, node.map_y),(node.map_neatox, node.map_neatoy)),
+           delimiter =", ",
+           fmt ='% s')
+
 def exit_handler(node):
-    # np.savetxt("map.csv",
-    #        node.map,
-    #        delimiter =", ",
-    #        fmt ='% s')
-    # plt.close('all')
+    """
+    This function is called after
+    """
+    save_data(node)
     fig = plt.figure()
-    plt.scatter(node.map_x, node.map_y)
+    for i in range(len(node.map_x)):
+        plt.scatter(node.map_x[i], node.map_y[i], color='b', alpha=0.3)
     plt.scatter(node.map_neatox, node.map_neatoy, color='r')
     plt.scatter(node.map_neatox[0], node.map_neatoy[0], color='y')
     plt.show()
@@ -69,6 +89,11 @@ class NeatoController():
         self.scan_topic = "scan"        # the topic where we will get laser scans from
         self.transform_helper = TFHelper()
         self.initialized = True
+        self.moved_flag = False
+        self.init_x = None
+        self.init_y = None
+        self.init_z = None
+        self.starting_threshold = 0.1
 
 
     def run(self):
@@ -99,13 +124,13 @@ class NeatoController():
             self.key = self.getKey()
             if self.key == 'w':
             	self.vel_msg.angular.z = 0
-            	self.vel_msg.linear.x = 1
+            	self.vel_msg.linear.x = 0.5
             elif self.key == 'a':
             	self.vel_msg.linear.x = 0
             	self.vel_msg.angular.z = 1
             elif self.key == 's':
             	self.vel_msg.angular.z = 0
-            	self.vel_msg.linear.x = -1
+            	self.vel_msg.linear.x = -0.5
             elif self.key == 'd':
             	self.vel_msg.linear.x = 0
             	self.vel_msg.angular.z = -1
@@ -124,7 +149,7 @@ class NeatoController():
             rospy.Rate(10).sleep
 
     def square(self):
-        print("X position: ", self.x, "\n Y position: ", self.y)
+        #print("X position: ", self.x, "\n Y position: ", self.y)
         self.vel_pub.publish(Twist(linear=Vector3(x=1)))
         rospy.sleep(2)
         self.vel_pub.publish(Twist(angular=Vector3(z=-math.pi/4)))
@@ -145,7 +170,7 @@ class NeatoController():
         self.vel_msg.angular.z = 0
         self.vel_msg.linear.x = 0
         self.vel_pub.publish(self.vel_msg)
-        print("X position: ", self.x, "\n Y position: ", self.y)
+        #print("X position: ", self.x, "\n Y position: ", self.y)
         self.state = "teleop"
 
     def process_scan(self, msg):
@@ -171,28 +196,44 @@ class NeatoController():
         #         self.map_y.append(y - self.y)
 
     def projected_scan_received(self, msg):
+        current_mapx = []
+        current_mapy = []
         for p in pc2.read_points(msg, field_names = ("x", "y", "z"), skip_nans=True):
-            print(" x : %f  y: %f  z: %f" %(p[0],p[1],p[2]))
-            self.map_x.append(p[0])
-            self.map_y.append(p[1])
-        # angles = np.linspace(0, 2*math.pi, num=361)
-        # for i, point in enumerate(msg.data):
-        #     if point != 0:
-        #         x = point * np.cos(angles[i])
-        #         y = point * np.sin(angles[i])
-        #         self.map_x.append(x - self.x)
-        #         self.map_y.append(y - self.y)
+            #print(" x : %f  y: %f  z: %f" %(p[0],p[1],p[2]))
+            current_mapx.append(p[0])
+            current_mapy.append(p[1])
+        self.map_x.append(current_mapx)
+        self.map_y.append(current_mapy)
 
 
     def process_odom(self,msg):
         #get our x and y position relative to the world origin"
         self.x = msg.pose.pose.position.x
         self.y = msg.pose.pose.position.y
+
+        if self.init_x == None:
+            self.init_x = self.x
+        if self.init_y == None:
+            self.init_y = self.y
+
         # Orientation of the neato according to global reference frame (odom)
         self.rotation = 180 - math.degrees(euler_from_quaternion([msg.pose.pose.orientation.w,msg.pose.pose.orientation.x,msg.pose.pose.orientation.y,msg.pose.pose.orientation.z])[0])
         # print("x: ", self.x, ", y: ", self.y, ", angle: ", self.rotation)
         self.map_neatox.append(self.x)
         self.map_neatoy.append(self.y)
+
+        distance = np.sqrt((self.x - self.init_x)**2 + (self.y - self.init_y)**2)
+
+        if distance > self.starting_threshold and not self.moved_flag:
+            self.moved_flag = True
+
+        if distance < self.starting_threshold and self.moved_flag:
+            print('Oh boy thats a loop closure')
+            self.moved_flag = False
+            old_scan = np.array((self.map_x[0], self.map_y[0]))
+            new_scan = np.array((self.map_x[-1],self.map_y[-1]))
+            t,d,i = icp(old_scan,new_scan)
+            print(t.shape)
 
     def origin(self):
         if self.linear_error < 1:
