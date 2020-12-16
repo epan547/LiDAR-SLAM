@@ -4,7 +4,7 @@ subtitle: by Emma Pan and Eamon O'Brien
 email: youremailaddress@gmail.com
 description: Emma Pan and Eamon O'Brien, CompRobo 2020
 baseurl: "/LiDAR-SLAM" # the subpath of your site, e.g. /blog
-url: # the base hostname & protocol for your site
+url: "https://epan547.github.io" # the base hostname & protocol for your site
 author:
 street_address: 
 city: 
