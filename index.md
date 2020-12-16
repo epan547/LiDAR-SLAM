@@ -1,3 +1,13 @@
+---
+layout: home
+title: Home
+landing-title: 'Hi, my name is Forty'
+description: null
+image: null
+author: null
+show_tile: false
+---
+
 ## LiDAR SLAM Themes for Neato Quarantines
 
 Eamon O'Brien and Emma Pan
