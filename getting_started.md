@@ -1,6 +1,7 @@
 ---
 layout: page
-title: Elements
+title: 'Getting Started'
+description: 'Instructions for running project'
 nav-menu: true
 ---
 
