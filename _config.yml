@@ -3,7 +3,7 @@ title: LiDAR SLAM
 subtitle: by Emma Pan and Eamon O'Brien
 email: youremailaddress@gmail.com
 description: Emma Pan and Eamon O'Brien, CompRobo 2020
-baseurl: "/forty-jekyll-theme" # the subpath of your site, e.g. /blog
+baseurl: "/LiDAR-SLAM" # the subpath of your site, e.g. /blog
 url: # the base hostname & protocol for your site
 author:
 street_address: 
