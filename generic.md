@@ -1,8 +1,8 @@
 ---
 layout: post
-title: Generic
-description: Lorem ipsum dolor est
-image: assets/images/pic11.jpg
+title: Blog
+description: Documentation of our learning process
+image: assets/images/downstairs.png
 nav-menu: true
 ---
 
