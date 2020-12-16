@@ -34,4 +34,4 @@ We will be doing a procedure very similar to what’s shown in the video with ou
 
 Our neato will be arriving in the mail today, so in parallel with our research we’re going to run the premade SLAM implementation from the particle filter project on our physical robot to start finding the extra complications that come with real-world systems.
 
-Some of the challenges we think we’re likely to run into are shapes in our house (like chairs) that our neato will have trouble recognizing with its 2D sensor system, getting messy data from the LiDAR that we need to filter, and trouble with the robot moving between smooth and carpeted areas.
+Some of the challenges we think we’re likely to run into are shapes in our house (like chairs) that our neato will have trouble recognizing with its 2D sensor system, getting messy data from the LiDAR that we need to filter, and trouble with the robot moving between smooth and carpeted areas
