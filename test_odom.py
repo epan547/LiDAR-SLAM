@@ -14,6 +14,7 @@ import atexit
 import numpy as np
 import matplotlib.pyplot as plt
 import time
+import pickle
 
 import tf
 from tf import TransformListener
@@ -37,10 +38,11 @@ def save_data(node):
     """
     This function saves data from projected stable laser scans and neato positional data from odom to file.
     """
-    np.savetxt("map.csv",
-           ((node.map_x, node.map_y),(node.map_neatox, node.map_neatoy)),
-           delimiter =", ",
-           fmt ='% s')
+    print(node.data)
+    filename = ('map'+ str(time.localtime())) + '.g2o'
+    outfile = open(filename, 'wb')
+    pickle.dump(node.data, outfile)
+    outfile.close()
 
 def exit_handler(node):
     """
@@ -48,11 +50,17 @@ def exit_handler(node):
     """
     save_data(node)
     plot_transform(node)
-    # fig = plt.figure()
-    # for i in range(len(node.map_x)):
-    #     plt.scatter(node.map_x[i], node.map_y[i], color='b', alpha=0.3)
-    # plt.scatter(node.map_neatox, node.map_neatoy, color='r')
-    # plt.scatter(node.map_neatox[0], node.map_neatoy[0], color='y')
+    # simple_graph(node)
+
+def simple_graph(node):
+    fig = plt.figure()
+    for i in range(len(node.map_x)):
+        plt.scatter(node.map_x[i], node.map_y[i], color='b', alpha=0.3)
+    plt.scatter(node.map_neatox, node.map_neatoy, color='r')
+    plt.scatter(node.map_neatox[0], node.map_neatoy[0], color='y')
+    plt.show()
+    time.sleep(5)
+    plt.close()
 
 def plot_transform(node):
     # Plot the original scan at beginning and end of loop closure
@@ -81,16 +89,10 @@ def apply_transform(scan, node):
     # Make C a homogeneous representation of B (later scan)
     C = np.ones((len(scan), 3))
     C[:,0:2] = scan
-    print("Before transform", C.shape)
 
     # Transform C
     C = np.dot(node.transform, C.T).T
-    print("After transform", C.shape)
     res = np.rot90(C, 3)
-    print(res.shape)
-    print(res[0])
-    print(res[1])
-    print(res[2])
     return res
 
 class NeatoController():
@@ -138,6 +140,7 @@ class NeatoController():
         self.index_saved = 0
         self.old_scan = []
         self.new_scan = []
+        self.data = {"odom":[],"scans":[],"closures":[]}
 
 
     def run(self):
@@ -220,13 +223,17 @@ class NeatoController():
     def projected_scan_received(self, msg):
         current_mapx = []
         current_mapy = []
+        pose_array = []
         for p in pc2.read_points(msg, field_names = ("x", "y", "z"), skip_nans=True):
             #print(" x : %f  y: %f  z: %f" %(p[0],p[1],p[2]))
             current_mapx.append(p[0])
             current_mapy.append(p[1])
+            point = Point(p[0],p[1],p[2])
+            quat = Quaternion(0,0,0,0)
+            pose_array.append(Pose(point, quat))
+        self.data["scans"].append(pose_array)
         self.map_x.append(current_mapx)
         self.map_y.append(current_mapy)
-
 
     def process_odom(self,msg):
         #get our x and y position relative to the world origin"
@@ -244,6 +251,8 @@ class NeatoController():
         self.map_neatox.append(self.x)
         self.map_neatoy.append(self.y)
 
+        self.data["odom"].append(msg.pose.pose)
+
         distance = np.sqrt((self.x - self.init_x)**2 + (self.y - self.init_y)**2)
 
         if distance > self.starting_threshold and not self.moved_flag:
@@ -253,11 +262,13 @@ class NeatoController():
             print('Oh boy thats a loop closure')
             self.moved_flag = False
             self.index_saved = len(self.map_x)-1
+            self.data["closures"] =  [0,self.index_saved]
             # Both scans should be in format: (361,2)
             self.old_scan = np.rot90(np.array((self.map_x[0], self.map_y[0])))
-            self.new_scan = np.rot90(np.array((self.map_x[-1],self.map_y[-1])))
+            self.new_scan = np.rot90(np.array((self.map_x[self.index_saved],self.map_y[self.index_saved])))
             # Use ICP to get 3x3 transformation matrix
             t,d,i = icp(self.old_scan,self.new_scan)
+
             node.transform = t
 
     def origin(self):
