@@ -2,7 +2,6 @@ import numpy as np
 import g2o
 import os
 import pickle
-# from graphslam.load import load_g2o_se3
 
 def get_data(filename):
     load_file = open(filename,'rb')
@@ -92,5 +91,6 @@ if __name__ == '__main__':
     data = get_data('data3')
     opt = PoseGraphOptimization()
     opt.make_vertices(data)
+    opt.save('og.g2o')
     opt.optimize()
     opt.save('yay.g2o')
