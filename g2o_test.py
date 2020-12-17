@@ -54,8 +54,8 @@ class PoseGraphOptimization(g2o.SparseOptimizer):
         for scan in lidar:
             for point in scan:
                 i = i+1
-                q = g2o.Quaternion(0,0,0,0)
-                t = g2o.Isometry3d(q,[point[0][0], point[0][1], point[0][2]])
+                # q = g2o.Quaternion(0,0,0,0)
+                t = g2o.Isometry3d(np.identity(3),[point[0][0], point[0][1], point[0][2]])
                 self.add_vertex(i, t)
 
         vertices = super().vertices()
@@ -63,9 +63,9 @@ class PoseGraphOptimization(g2o.SparseOptimizer):
         for f, point in enumerate(odom):
             if f % 2 == 0:
                 i = i+1
-                q = g2o.Quaternion(0,0,0,0)
+                # q = g2o.Quaternion(0,0,0,0)
                 # Add odom vertices
-                t = g2o.Isometry3d(q,[point[0][0], point[0][1], point[0][2]])
+                t = g2o.Isometry3d(np.identity(3),[point[0][0], point[0][1], point[0][2]])
                 self.add_vertex(i, t)
 
                 # Add edges between current odom point and all corresponding lidar points
@@ -76,13 +76,16 @@ class PoseGraphOptimization(g2o.SparseOptimizer):
                     # lidar_pt = self.vertex(super(), x+start_index).estimate()
                     # diff = t - lidar_pt.estimate()
                     # lidar_pt
-                    diff = g2o.Isometry3d(q, [(point[0][0]-lidar_pt[0]), (point[0][1]-lidar_pt[1]), (point[0][2]-lidar_pt[2])])
+                    diff = g2o.Isometry3d(np.identity(3), [(point[0][0]-lidar_pt[0]), (point[0][1]-lidar_pt[1]), (point[0][2]-lidar_pt[2])])
                     self.add_edge([i, x], diff)
+
+        # Add edge from loop closures
+        closure = data['closures']
+        diff = g2o.Isometry3d(np.identity(3)*100, [0,0,0])
+        self.add_edge([closure[0], closure[1]], )
 
         print('num vertices:', len(super().vertices()))
         print('num edges: ', len(super().edges()))
-
-        pose_graph.add_edge([pose_id_left,pose_id_righ],t)
 
 if __name__ == '__main__':
     data = get_data('data3')
