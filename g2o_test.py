@@ -76,7 +76,7 @@ class PoseGraphOptimization(g2o.SparseOptimizer):
                     # lidar_pt = self.vertex(super(), x+start_index).estimate()
                     # diff = t - lidar_pt.estimate()
                     # lidar_pt
-                    diff = g2o.Isometry3d(q, (point[0][0]-lidar_pt[0]), (point[0][1]-lidar_pt[1]), (point[0][2]-lidar_pt[2]))
+                    diff = g2o.Isometry3d(q, [(point[0][0]-lidar_pt[0]), (point[0][1]-lidar_pt[1]), (point[0][2]-lidar_pt[2])])
                     self.add_edge([i, x], diff)
 
         print('num vertices:', len(super().vertices()))
