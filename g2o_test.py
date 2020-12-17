@@ -81,6 +81,7 @@ class PoseGraphOptimization(g2o.SparseOptimizer):
                 self.add_vertex(i, t)
 
         vertices = super().vertices()
+        start_odom_vertices = len(vertices)
         print(len(vertices))
         # Loop through odom points
         for f, point in enumerate(odom):
@@ -102,7 +103,7 @@ class PoseGraphOptimization(g2o.SparseOptimizer):
         # Add edge from loop closures
         closure = data['closures']
         diff = g2o.Isometry3d(np.identity(3)*5, [0,0,0])
-        self.add_edge([closure[0], closure[1]], diff)
+        self.add_edge(start_odom_vertices, len(super().vertices())-1, diff)
 
         print('num vertices:', len(super().vertices()))
         print('num edges: ', len(super().edges()))
