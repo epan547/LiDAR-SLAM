@@ -2,41 +2,43 @@
 title: Landing
 layout: landing
 description: 'Lorem ipsum dolor sit amet nullam consequa<br />sed veroeros. tempus adipiscing nulla.'
-image: assets/images/pic07.jpg
+image: assets/images/pic09.jpg
 nav-menu: true
 ---
 
 <!-- Main -->
 <div id="main">
 
-<!-- One -->
-<!-- <section id="One">
-	<div class="inner">
-		<header class="major">
-			<h2>2D LiDAR Based SLAM</h2>
-		</header>
-		<p>The goal of our project was to implement a basic SLAM alorithm using a physical Neato from Olin. SLAM is a class of algorithms for simultaneously mapping an area and locating the robot within that map. We used the Neato's built-in LiDAR and wheel encoders to sense the environment, and a method called Graph Optimization to map it.</p>
-	</div>
-</section> -->
-
-<!-- Two -->
 <section id="Two" class="spotlights">
 	<section>
 		<a href="#" class="image">
-			<img src="{% link assets/images/drift.png %}" alt="" data-position="center center" />
+			<img src="./assets/images/upstairs.png" alt="" data-position="top center" />
 		</a>
 		<div class="content">
 			<div class="inner">
 				<header class="major">
-					<h3>Graph Optimization</h3>
+					<h2>2D LiDAR Based SLAM</h2>
+				</header>
+				<p>The goal of our project was to implement a basic SLAM alorithm using a physical Neato from Olin. SLAM is a class of algorithms for simultaneously mapping an area and locating the robot within that map. We used the Neato's built-in LiDAR and wheel encoders to sense the environment, and a method called Graph Optimization to map it.</p>
+			</div>
+		</div>
+	</section>
+	<section>
+		<a href="#" class="image">
+			<img src="./assets/images/drift.png" alt="" data-position="center center" />
+		</a>
+		<div class="content">
+			<div class="inner">
+				<header class="major">
+					<h3>Collecting Data</h3>
 				</header>
 				<p>To use graph optimization for SLAM, we recorded the locations of the robot and its LiDAR measurements in the odometry reference frame as nodes on a graph. We recorded the distance between these points, as measured by the sensors, as edges between those nodes. So long as all the measurements agree, there is no optimization to be done, and we can plot the data directly. However, none of our sensors are perfect, so we are likely to get a graph that resembles the one to the left. </p>
 			</div>
 		</div>
 	</section>
 	<section>
-		<a href="generic.html" class="image">
-			<img src="{% link assets/images/stablescan.jpg %}" alt="" data-position="top center" />
+		<a href="#" class="image">
+			<img src="./assets/images/stablescan.png" alt="" data-position="top center" />
 		</a>
 		<div class="content">
 			<div class="inner">
@@ -51,8 +53,8 @@ nav-menu: true
 		</div>
 	</section>
 	<section>
-		<a href="generic.html" class="image">
-			<img src="./assets/images/labelled_icp_transform.png" alt="" data-position="25% 25%" />
+		<a href="#" class="image">
+			<img src="./assets/images/labelled_icp_transform.png" alt="" data-position="top center" />
 		</a>
 		<div class="content">
 			<div class="inner">
@@ -63,18 +65,31 @@ nav-menu: true
 			</div>
 		</div>
 	</section>
-</section>
-<section>
-	<a href="generic.html" class="image">
-		<img src="./assets/images/uninspiring.png" alt="" data-position="25% 25%" />
-	</a>
-	<div class="content">
-		<div class="inner">
-			<header class="major">
-				<h3>G2opy</h3>
-			</header>
-			<p>With a set of measurements and a loop closure, we were able to feed our data into g2opy, a python library built for graph optimization for SLAM. The results were... uninspiring.</p>
+	<section>
+		<a href="#" class="image">
+			<img src="./assets/images/icp_transform.png" alt="" data-position="top center" />
+		</a>
+		<div class="content">
+			<div class="inner">
+				<header class="major">
+					<h3>After ICP</h3>
+				</header>
+				<p>With a set of measurements and a loop closure, we were able to feed our data into g2opy, a python library built for graph optimization for SLAM. The results were... uninspiring.</p>
+			</div>
 		</div>
-	</div>
+	</section>
+	<section>
+		<a href="#" class="image">
+			<img src="./assets/images/uninspiring.png" alt="" data-position="center center" />
+		</a>
+		<div class="content">
+			<div class="inner">
+				<header class="major">
+					<h3>G2opy</h3>
+				</header>
+				<p>With a set of measurements and a loop closure, we were able to feed our data into g2opy, a python library built for graph optimization for SLAM. The results were... uninspiring.</p>
+			</div>
+		</div>
+	</section>
 </section>
-</section>
+</div>
