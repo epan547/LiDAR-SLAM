@@ -52,7 +52,8 @@ class PoseGraphOptimization(g2o.SparseOptimizer):
         for scan in lidar:
             for i,point in enumerate(scan):
                 q = g2o.Quaternion(0,0,0,0)
-                t = g2o.Isometry3d(q,np.array(point[0][0], point[0][1], point[0][2]))
+                pose = np.array(point[0][0], point[0][1], point[0][2])
+                t = g2o.Isometry3d(q,pose)
                 self.add_vertex(i, t)
         for f, point in enumerate(odom):
             if f % 2 == 0:
