@@ -61,7 +61,7 @@ class PoseGraphOptimization(g2o.SparseOptimizer):
         vertices = super().vertices()
         # Loop through odom points
         for f, point in enumerate(odom):
-            if f > len(lidar):
+            if f >= len(lidar):
                 break
             if f % 2 == 0:
                 i = i+1
