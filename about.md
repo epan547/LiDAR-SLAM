@@ -10,17 +10,17 @@ nav-menu: true
 <div id="main">
 
 <!-- One -->
-<section id="2D LiDAR Based SLAM">
+<section id="One">
 	<div class="inner">
 		<header class="major">
-			<h2>Sed amet aliquam</h2>
+			<h2>2D LiDAR Based SLAM</h2>
 		</header>
 		<p>The goal of our project was to implement a basic SLAM alorithm using a physical Neato from Olin. SLAM is a class of algorithms for simaltaneously mapping an area and locating the robot within that map. We used the Neato's built-in LiDAR and wheel encoders to sense the environment, and a method called Graph Optimization to map it.</p>
 	</div>
 </section>
 
 <!-- Two -->
-<section id="Graph Optimization" class="spotlights">
+<section id="Two" class="spotlights">
 	<section>
 		<a href="generic.html" class="image">
 			<img src="{% link assets/images/Driffft.png %}" alt="" data-position="center center" />
@@ -28,7 +28,7 @@ nav-menu: true
 		<div class="content">
 			<div class="inner">
 				<header class="major">
-					<h3>Orci maecenas</h3>
+					<h3>Graph Optimization</h3>
 				</header>
 				<p>To use graph optimization for SLAM, we recorded the locations of the robot and its LiDAR measurements in the odometry reference frame as nodes on a graph. We recorded the distance between these points, as measured by the sensors, as edges between those nodes. So long as all the measurements agree, there is no optimization to be done, and we can plot the data directly. However, none of our sensors are perfect, so we are likely to get a graph that resembles the one to the left. </p>
 			</div>
