@@ -15,7 +15,7 @@ nav-menu: true
 		<header class="major">
 			<h2>2D LiDAR Based SLAM</h2>
 		</header>
-		<p>The goal of our project was to implement a basic SLAM alorithm using a physical Neato from Olin. SLAM is a class of algorithms for simaltaneously mapping an area and locating the robot within that map. We used the Neato's built-in LiDAR and wheel encoders to sense the environment, and a method called Graph Optimization to map it.</p>
+		<p>The goal of our project was to implement a basic SLAM alorithm using a physical Neato from Olin. SLAM is a class of algorithms for simultaneously mapping an area and locating the robot within that map. We used the Neato's built-in LiDAR and wheel encoders to sense the environment, and a method called Graph Optimization to map it.</p>
 	</div>
 </section>
 
@@ -36,7 +36,7 @@ nav-menu: true
 	</section>
 	<section>
 		<a href="generic.html" class="image">
-			<img src="{% link assets/images/pic09.jpg %}" alt="" data-position="top center" />
+			<img src="{% link assets/images/stablescan.jpg %}" alt="" data-position="top center" />
 		</a>
 		<div class="content">
 			<div class="inner">
@@ -52,17 +52,14 @@ nav-menu: true
 	</section>
 	<section>
 		<a href="generic.html" class="image">
-			<img src="{% link assets/images/projected!stable!scan!.png %}" alt="" data-position="25% 25%" />
+			<img src="{% link assets/images/labelled_icp_transform.png %}" alt="" data-position="25% 25%" />
 		</a>
 		<div class="content">
 			<div class="inner">
 				<header class="major">
-					<h3>Sed nunc ligula</h3>
+					<h3>Iterative Closest Points</h3>
 				</header>
-				<p>Nullam et orci eu lorem consequat tincidunt vivamus et sagittis magna sed nunc rhoncus condimentum sem. In efficitur ligula tate urna. Maecenas massa sed magna lacinia magna pellentesque lorem ipsum dolor. Nullam et orci eu lorem consequat tincidunt. Vivamus et sagittis tempus.</p>
-				<ul class="actions">
-					<li><a href="generic.html" class="button">Learn more</a></li>
-				</ul>
+				<p>We chose to generate loop closures by recording when the robot's odometry thought it had returned to its original position. This is an unsophisticated method, and wouldn't work if the odometry readings were bad enough, but it let us test the whole system. Once the robot returned to its original position, it would have two scans ostensibly in the same location. These scans will inevitably match imperfectly, and the constraint we need to run graph optimization is the real distance between the robot's position when it took the first scan, and the robot's position when it took the second scan. We ran an algorithm called Iterative Closest Points to find this transform, and used that as our loop closure.</p>
 			</div>
 		</div>
 	</section>
