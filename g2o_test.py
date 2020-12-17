@@ -55,7 +55,7 @@ class PoseGraphOptimization(g2o.SparseOptimizer):
             for point in scan:
                 i = i+1
                 # q = g2o.Quaternion(0,0,0,0)
-                t = g2o.Isometry3d(np.identity(3),[point[0][0], point[0][1], 0])
+                t = g2o.Isometry3d(np.identity(3),[point[0], point[1], 0])
                 self.add_vertex(i, t)
 
         vertices = super().vertices()
@@ -68,14 +68,14 @@ class PoseGraphOptimization(g2o.SparseOptimizer):
                 i = i+1
                 # q = g2o.Quaternion(0,0,0,0)
                 # Add odom vertices
-                t = g2o.Isometry3d(np.identity(3),[point[0][0], point[0][1], 0])
+                t = g2o.Isometry3d(np.identity(3),[point[0], point[1], 0])
                 self.add_vertex(i, t)
 
                 # Add edges between current odom point and all corresponding lidar points
                 start_index = int((f/2) * 360)
                 for x in range(360):
-                    lidar_pt = lidar[int(f/2)][x][0]
-                    diff = g2o.Isometry3d(np.identity(3), [(point[0][0]-lidar_pt[0]), (point[0][1]-lidar_pt[1]), 0])
+                    lidar_pt = lidar[int(f/2)][x]
+                    diff = g2o.Isometry3d(np.identity(3), [(point[0]-lidar_pt[0]), (point[1]-lidar_pt[1]), 0])
                     self.add_edge([i, x], diff)
 
         # Add edge from loop closures
@@ -87,9 +87,9 @@ class PoseGraphOptimization(g2o.SparseOptimizer):
         print('num edges: ', len(super().edges()))
 
 if __name__ == '__main__':
-    data = get_data('NewData')
+    data = get_data('data_4')
     opt = PoseGraphOptimization()
     opt.make_vertices(data)
-    opt.save('og.g2o')
+    opt.save('og1.g2o')
     opt.optimize()
-    opt.save('yay.g2o')
+    opt.save('yay1.g2o')

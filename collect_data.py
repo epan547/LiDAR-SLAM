@@ -39,7 +39,9 @@ def save_data(node):
     This function saves data from projected stable laser scans and neato positional data from odom to file.
     """
     print("lidar length: ", len(node.data['scans']))
+    print("length of each scan: ", len(node.data['scans'][0]))
     print("odom length: ", len(node.data['odom']))
+    print("closures length: ", len(node.data['closures']))
     filename = ('map'+ str(time.localtime())) + '.g2o'
     outfile = open(filename, 'wb')
     pickle.dump(node.data, outfile)
@@ -91,7 +93,7 @@ def apply_transform(scan, node):
     C = np.ones((len(scan), 3))
     C[:,0:2] = scan
 
-    # Transform C
+    # Apply transform to C
     C = np.dot(node.transform, C.T).T
     res = np.rot90(C, 3)
     return res
@@ -229,9 +231,7 @@ class NeatoController():
             #print(" x : %f  y: %f  z: %f" %(p[0],p[1],p[2]))
             current_mapx.append(p[0])
             current_mapy.append(p[1])
-            point = (p[0],p[1],p[2])
-            quat = (0,0,0,0)
-            pose_array.append([point, quat])
+            pose_array.append([p[0],p[1],p[2]])
         self.data["scans"].append(pose_array)
         self.map_x.append(current_mapx)
         self.map_y.append(current_mapy)
@@ -251,7 +251,7 @@ class NeatoController():
         self.map_neatox.append(self.x)
         self.map_neatoy.append(self.y)
 
-        self.data["odom"].append([(self.x, self.y, 0), (0,0,0,0)])
+        self.data["odom"].append([self.x, self.y, 0])
 
         distance = np.sqrt((self.x - self.init_x)**2 + (self.y - self.init_y)**2)
 
