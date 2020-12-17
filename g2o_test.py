@@ -7,6 +7,27 @@ def get_data(filename):
     load_file = open(filename,'rb')
     data = pickle.load(load_file)
     #print(data)
+    skipped_vertices = []
+    # Pre-filtering the data for making future processing easier
+    # Check the LiDAR scans for incomplete scans to filter out
+    for i, scan in enumerate(data['scans']):
+        if len(scan) < 361:
+            skipped_vertices.append(i)
+    # Sample only half of the odom data, because it collects twice as often as lidar
+    new_odom_data = []
+    for k, scan in enumerate(data['odom']):
+        if k % 2 == 0:
+            new_odom_data.append(scan)
+    data['odom'] = new_odom_data
+    # Remove the incomplete scans from LiDAR and odom data
+    for j in reverse(skipped_vertices):
+        data['scans'].del(j)
+        data['odom'].del(j)
+
+    print("lidar length: ", len(data['scans']))
+    print("length of each scan: ", len(data['scans'][0]))
+    print("odom length: ", len(data['odom']))
+
     return data
 
 class PoseGraphOptimization(g2o.SparseOptimizer):
@@ -69,7 +90,7 @@ class PoseGraphOptimization(g2o.SparseOptimizer):
         # Loop through odom points
         for f, point in enumerate(odom):
             # End the loop if there are more odom points than LiDAR, since we are only keeping even values
-            if f >= len(lidar):
+            if f/2 > len(lidar):
                 break
             # Skip the scans that were skipped for LiDAR
             if f in skipped_scans:
