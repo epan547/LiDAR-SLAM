@@ -62,6 +62,6 @@ class PoseGraphOptimization(g2o.SparseOptimizer):
 
 
 if __name__ == '__main__':
-    data = get_data('data')
+    data = get_data('data3')
     opt = PoseGraphOptimization()
     opt.make_vertices(data)
