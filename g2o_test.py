@@ -52,6 +52,7 @@ class PoseGraphOptimization(g2o.SparseOptimizer):
         i = -1
         # Loop through lidar
         for scan in lidar:
+            print(len(scan))
             for point in scan:
                 i = i+1
                 # q = g2o.Quaternion(0,0,0,0)
