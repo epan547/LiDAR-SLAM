@@ -91,3 +91,4 @@ if __name__ == '__main__':
     data = get_data('data3')
     opt = PoseGraphOptimization()
     opt.make_vertices(data)
+    opt.optimize()
