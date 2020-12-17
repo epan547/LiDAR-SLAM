@@ -38,7 +38,8 @@ def save_data(node):
     """
     This function saves data from projected stable laser scans and neato positional data from odom to file.
     """
-    print(node.data)
+    print("lidar length: ", len(node.data['scans']))
+    print("odom length: ", len(node.data['odom']))
     filename = ('map'+ str(time.localtime())) + '.g2o'
     outfile = open(filename, 'wb')
     pickle.dump(node.data, outfile)
@@ -247,7 +248,6 @@ class NeatoController():
 
         # Orientation of the neato according to global reference frame (odom)
         self.rotation = 180 - math.degrees(euler_from_quaternion([msg.pose.pose.orientation.w,msg.pose.pose.orientation.x,msg.pose.pose.orientation.y,msg.pose.pose.orientation.z])[0])
-        # print("x: ", self.x, ", y: ", self.y, ", angle: ", self.rotation)
         self.map_neatox.append(self.x)
         self.map_neatoy.append(self.y)
 
@@ -271,16 +271,6 @@ class NeatoController():
 
             node.transform = t
 
-    def origin(self):
-        if self.linear_error < 1:
-            self.state = "teleop"
-        else:
-            self.angular_vel = self.angular_k * self.angular_error
-            self.linear_vel = self.linear_k * self.linear_error
-            # send instructions to the robot
-            self.vel_pub.publish(Twist(linear=Vector3(x=self.linear_vel), angular=Vector3(z=self.angular_vel)))
-            #print("Angular velocity: ", self.angular_vel, ", Linear velocity: ", self.linear_vel)
-            rospy.Rate(10).sleep
 
 if __name__ == '__main__':
     node = NeatoController()
