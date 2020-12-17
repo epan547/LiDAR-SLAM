@@ -24,6 +24,7 @@ def get_data(filename):
         del data['scans'][j]
         del data['odom'][j]
 
+    print("Number of skipped vertices: ", len(skipped_vertices))
     print("lidar length: ", len(data['scans']))
     print("length of each scan: ", len(data['scans'][0]))
     print("odom length: ", len(data['odom']))
@@ -71,13 +72,8 @@ class PoseGraphOptimization(g2o.SparseOptimizer):
         lidar = data['scans']
         odom = data['odom']
         i = -1
-        skipped_scans = []
         # Loop through lidar
         for k,scan in enumerate(lidar):
-            # Skip the scans that are the wrong length
-            if len(scan) < 361:
-                skipped_scans.append(k)
-                continue
             for point in scan:
                 i = i+1
                 # q = g2o.Quaternion(0,0,0,0)
@@ -90,26 +86,19 @@ class PoseGraphOptimization(g2o.SparseOptimizer):
         # Loop through odom points
         for f, point in enumerate(odom):
             # End the loop if there are more odom points than LiDAR, since we are only keeping even values
-            if f/2 > len(lidar):
+            if f > len(lidar):
                 break
-            # Skip the scans that were skipped for LiDAR
-            if f in skipped_scans:
-                continue
-            if f % 2 == 0:
-                i = i+1
-                # q = g2o.Quaternion(0,0,0,0)
-                # Add odom vertices
-                t = g2o.Isometry3d(np.identity(3),[point[0], point[1], 0])
-                self.add_vertex(i, t)
+            i = i+1
+            # Add odom vertices
+            t = g2o.Isometry3d(np.identity(3),[point[0], point[1], 0])
+            self.add_vertex(i, t)
 
-                # Add edges between current odom point and all corresponding lidar points
-                start_index = int((f/2) * 361)
-                for x in range(361):
-                    # print(len(lidar[int(f/2)]))
-                    # print(x)
-                    lidar_pt = lidar[int(f/2)][x]
-                    diff = g2o.Isometry3d(np.identity(3), [(point[0]-lidar_pt[0]), (point[1]-lidar_pt[1]), 0])
-                    self.add_edge([i, x], diff)
+            # Add edges between current odom point and all corresponding lidar points
+            start_index = int((f) * 361)
+            for x in range(361):
+                lidar_pt = lidar[f][x]
+                diff = g2o.Isometry3d(np.identity(3), [(point[0]-lidar_pt[0]), (point[1]-lidar_pt[1]), 0])
+                self.add_edge([i, x], diff)
 
         # Add edge from loop closures
         closure = data['closures']
