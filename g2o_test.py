@@ -82,7 +82,7 @@ class PoseGraphOptimization(g2o.SparseOptimizer):
         # Add edge from loop closures
         closure = data['closures']
         diff = g2o.Isometry3d(np.identity(3)*100, [0,0,0])
-        self.add_edge([closure[0], closure[1]], )
+        self.add_edge([closure[0], closure[1]], diff)
 
         print('num vertices:', len(super().vertices()))
         print('num edges: ', len(super().edges()))
