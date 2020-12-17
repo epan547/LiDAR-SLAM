@@ -49,23 +49,35 @@ def save_data(node):
 
 def exit_handler(node):
     """
-    This function is called after the
+    This function is called when the program is terminated. It saves the LiDAR and odometry data that the robot
+    collected between start and the first loop close, then  runs ICP on the first and last scans, showing the
+    ouput.
     """
     save_data(node)
     plot_transform(node)
     # simple_graph(node)
 
 def simple_graph(node):
+    """
+    This uses matplotlib to show all the lidar and odom data collected without any optimization or correction.
+    """
     fig = plt.figure()
+    # Plot each LiDAR scan
     for i in range(len(node.map_x)):
         plt.scatter(node.map_x[i], node.map_y[i], color='b', alpha=0.3)
+    # Plot all odom data
     plt.scatter(node.map_neatox, node.map_neatoy, color='r')
+    # Plot the robot's start point in yellow
     plt.scatter(node.map_neatox[0], node.map_neatoy[0], color='y')
     plt.show()
-    time.sleep(5)
+    time.sleep(5) # show the graph for 5 seconds
     plt.close()
 
 def plot_transform(node):
+    """
+    This function shows the lidar data from the first and last scan (the loop closure)
+    and applies the transform from ICP to the last scan. It plots the scans before and after ICP.
+    """
     # Plot the original scan at beginning and end of loop closure
     fig, ax = plt.subplots(nrows=1, ncols=2, squeeze=False)
     ax[0][0].scatter(node.map_x[0], node.map_y[0])
@@ -88,6 +100,10 @@ def plot_transform(node):
     plt.close()
 
 def apply_transform(scan, node):
+    """
+    This applies the a rigid tranform to a set of LiDAR scans. We use it to adjust the
+    loop closure scan after ICP gives us a transform.
+    """
     # Calculate the transformed scan
     # Make C a homogeneous representation of B (later scan)
     C = np.ones((len(scan), 3))
@@ -100,7 +116,8 @@ def apply_transform(scan, node):
 
 class NeatoController():
     """
-    This class encompasses multiple behaviors for the simulated neato
+    This class encompasses multiple behaviors for the simulated neato. They allow the robot to be teleoped
+    or driven in a square, and handle the collecting of data.
     """
     def __init__(self):
         rospy.init_node('finite_state')
@@ -169,6 +186,9 @@ class NeatoController():
         return key
 
     def teleop(self):
+        """
+        Lets you drive a neato with wasd!
+        """
         # Checking user input
         if self.key != '\x03':
             self.key = self.getKey()
@@ -199,6 +219,9 @@ class NeatoController():
             rospy.Rate(10).sleep
 
     def square(self):
+        """
+        Just drives the neato clockwise in a square.
+        """
         #print("X position: ", self.x, "\n Y position: ", self.y)
         self.vel_pub.publish(Twist(linear=Vector3(x=1)))
         rospy.sleep(2)
@@ -224,6 +247,10 @@ class NeatoController():
         self.state = "teleop"
 
     def projected_scan_received(self, msg):
+        """
+        Runs each time the neato takes a lidar scan.saves the x and y coordinates of each
+        laser point in the odom frame to self.map_x and self.map_y respectively.
+        """
         current_mapx = []
         current_mapy = []
         pose_array = []
@@ -235,8 +262,20 @@ class NeatoController():
         self.data["scans"].append(pose_array)
         self.map_x.append(current_mapx)
         self.map_y.append(current_mapy)
+        # map_x and map_y are lists of lists of three values.
 
     def process_odom(self,msg):
+        """
+        Runs each time the neato recieves odom data and saves the x and y coordinates
+        of the robot's position to self.map_neatox and self.map_neatoy.
+
+        Also, if the odometry indicates that the robot has left its starting position and
+        is not back within 10 cm of it, it records the index of that scan as a loop closure and stops
+        recording data.
+
+        Once it's recorded a loop closure, it runs ICP on the first and last scans and saves the
+        resulting transform to self.tranform
+        """
         #get our x and y position relative to the world origin"
         self.x = msg.pose.pose.position.x
         self.y = msg.pose.pose.position.y
@@ -255,13 +294,14 @@ class NeatoController():
 
         distance = np.sqrt((self.x - self.init_x)**2 + (self.y - self.init_y)**2)
 
-        if distance > self.starting_threshold and not self.moved_flag:
+        if distance > self.starting_threshold and not self.moved_flag: # if we have left the starting area for the first time
             self.moved_flag = True
 
-        if distance < self.starting_threshold and self.moved_flag:
+        if distance < self.starting_threshold and self.moved_flag: # if we are returning to the starting area for the first time
             print('Oh boy thats a loop closure')
             self.moved_flag = False
             self.index_saved = len(self.map_x)-1
+            # save the idex of the loop closure to the data
             self.data["closures"] =  [0,self.index_saved]
             # Both scans should be in format: (361,2)
             self.old_scan = np.rot90(np.array((self.map_x[0], self.map_y[0])))
@@ -273,6 +313,6 @@ class NeatoController():
 
 
 if __name__ == '__main__':
-    node = NeatoController()
+    node = NeatoController() # Initialize the robot
     node.run()
-    atexit.register(exit_handler,node)
+    atexit.register(exit_handler,node) # when the program ends, save the data we collected
