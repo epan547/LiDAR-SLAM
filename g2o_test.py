@@ -50,9 +50,14 @@ class PoseGraphOptimization(g2o.SparseOptimizer):
         lidar = data['scans']
         odom = data['odom']
         i = -1
+        skipped_scans = []
         # Loop through lidar
-        for scan in lidar:
+        for k,scan in enumerate(lidar):
             print(len(scan))
+            # Skip the scans that are the wrong length
+            if len(scan) < 361:
+                skipped_scans.append(k)
+                continue
             for point in scan:
                 i = i+1
                 # q = g2o.Quaternion(0,0,0,0)
@@ -63,8 +68,12 @@ class PoseGraphOptimization(g2o.SparseOptimizer):
         print(len(vertices))
         # Loop through odom points
         for f, point in enumerate(odom):
+            # End the loop if there are more odom points than LiDAR, since we are only keeping even values
             if f >= len(lidar):
                 break
+            # Skip the scans that were skipped for LiDAR
+            if f in skipped_scans:
+                continue
             if f % 2 == 0:
                 i = i+1
                 # q = g2o.Quaternion(0,0,0,0)
