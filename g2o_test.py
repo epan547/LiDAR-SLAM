@@ -2,7 +2,7 @@ import numpy as np
 import g2o
 import os
 import pickle
-from graphslam.load import load_g2o_se3
+# from graphslam.load import load_g2o_se3
 
 def get_data(filename):
     load_file = open(filename,'rb')
