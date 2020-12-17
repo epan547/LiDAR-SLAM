@@ -74,3 +74,17 @@ nav-menu: true
 		</div>
 	</section>
 </section>
+<section>
+	<a href="generic.html" class="image">
+		<img src="./assets/images/pic09.png" alt="" data-position="25% 25%" />
+	</a>
+	<div class="content">
+		<div class="inner">
+			<header class="major">
+				<h3>G2opy</h3>
+			</header>
+			<p>With a set of measurements and a loop closure, we were able to feed our data into g2opy, a python library built for graph optimization for SLAM. The results were... uninspiring.</p>
+		</div>
+	</div>
+</section>
+</section>
