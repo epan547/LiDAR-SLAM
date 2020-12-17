@@ -74,19 +74,13 @@ class PoseGraphOptimization(g2o.SparseOptimizer):
                 # Add edges between current odom point and all corresponding lidar points
                 start_index = int((f/2) * 360)
                 for x in range(360):
-                    # print("F/2 = " + str(f/2))
-                    # print("X = " + str(x))
                     lidar_pt = lidar[int(f/2)][x][0]
-                    # lidar_pt = vertices[int(x+start_index)].estimate()
-                    # lidar_pt = self.vertex(super(), x+start_index).estimate()
-                    # diff = t - lidar_pt.estimate()
-                    # lidar_pt
                     diff = g2o.Isometry3d(np.identity(3), [(point[0][0]-lidar_pt[0]), (point[0][1]-lidar_pt[1]), 0])
                     self.add_edge([i, x], diff)
 
         # Add edge from loop closures
         closure = data['closures']
-        diff = g2o.Isometry3d(np.identity(3)*100, [0,0,0])
+        diff = g2o.Isometry3d(np.identity(3)*5, [0,0,0])
         self.add_edge([closure[0], closure[1]], diff)
 
         print('num vertices:', len(super().vertices()))
