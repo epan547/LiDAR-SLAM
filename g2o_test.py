@@ -82,7 +82,6 @@ class PoseGraphOptimization(g2o.SparseOptimizer):
 
         vertices = super().vertices()
         print(len(vertices))
-        print(skipped_scans)
         # Loop through odom points
         for f, point in enumerate(odom):
             # End the loop if there are more odom points than LiDAR, since we are only keeping even values
