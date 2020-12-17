@@ -49,8 +49,10 @@ class PoseGraphOptimization(g2o.SparseOptimizer):
     def make_vertices(self, data):
         lidar = data['scans']
         odom = data['odom']
+        i = 0
         for scan in lidar:
-            for i,point in enumerate(scan):
+            for point in scan:
+                i = i+1
                 q = g2o.Quaternion(0,0,0,0)
                 t = g2o.Isometry3d(q,[point[0][0], point[0][1], point[0][2]])
                 self.add_vertex(i, t)
