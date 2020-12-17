@@ -76,7 +76,7 @@ nav-menu: true
 </section>
 <section>
 	<a href="generic.html" class="image">
-		<img src="./assets/images/pic09.png" alt="" data-position="25% 25%" />
+		<img src="./assets/images/uninspiring.png" alt="" data-position="25% 25%" />
 	</a>
 	<div class="content">
 		<div class="inner">
