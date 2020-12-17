@@ -68,7 +68,7 @@ class PoseGraphOptimization(g2o.SparseOptimizer):
     def get_pose(self, id):
         return self.vertex(id).estimate()
 
-    def make_vertices(self, data):
+    def make_graph(self, data):
         lidar = data['scans']
         odom = data['odom']
         i = -1
@@ -110,7 +110,8 @@ class PoseGraphOptimization(g2o.SparseOptimizer):
 if __name__ == '__main__':
     data = get_data('data_4')
     opt = PoseGraphOptimization()
-    opt.make_vertices(data)
+    opt.make_graph(data)
     opt.save('og1.g2o')
     opt.optimize()
     opt.save('yay1.g2o')
+68230
