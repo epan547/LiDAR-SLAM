@@ -20,7 +20,7 @@ def get_data(filename):
             new_odom_data.append(scan)
     data['odom'] = new_odom_data
     # Remove the incomplete scans from LiDAR and odom data
-    for j in reverse(skipped_vertices):
+    for j in reversed(skipped_vertices):
         del data['scans'][j]
         del data['odom'][j]
 
