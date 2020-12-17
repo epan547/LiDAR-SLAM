@@ -80,6 +80,19 @@ nav-menu: true
 	</section>
 	<section>
 		<a href="#" class="image">
+			<img src="./assets/images/disheartening.png" alt="" data-position="center center" />
+		</a>
+		<div class="content">
+			<div class="inner">
+				<header class="major">
+					<h3>G2opy</h3>
+				</header>
+				<p>With a set of measurements and a loop closure, we were able to feed our data into g2opy, a python library built for graph optimization for SLAM.</p>
+			</div>
+		</div>
+	</section>
+	<section>
+		<a href="#" class="image">
 			<img src="./assets/images/uninspiring.png" alt="" data-position="center center" />
 		</a>
 		<div class="content">
@@ -87,7 +100,7 @@ nav-menu: true
 				<header class="major">
 					<h3>G2opy</h3>
 				</header>
-				<p>With a set of measurements and a loop closure, we were able to feed our data into g2opy, a python library built for graph optimization for SLAM. The results were... uninspiring.</p>
+				<p>The results were... uninspiring.</p>
 			</div>
 		</div>
 	</section>
