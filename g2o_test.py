@@ -6,7 +6,7 @@ import pickle
 def get_data(filename):
     load_file = open(filename,'rb')
     data = pickle.load(load_file)
-    print(data)
+    #print(data)
     return data
 
 class PoseGraphOptimization(g2o.SparseOptimizer):
