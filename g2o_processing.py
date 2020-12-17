@@ -4,9 +4,13 @@ import os
 import pickle
 
 def get_data(filename):
+    """
+    This funciton loads data pickled by the process_data script and removes half the odometry measurements
+    so that we have the same number of laser scans and odom measurements. It also removes laser scans without the full
+    361 measurements.
+    """
     load_file = open(filename,'rb')
     data = pickle.load(load_file)
-    #print(data)
     skipped_vertices = []
     # Pre-filtering the data for making future processing easier
     # Check the LiDAR scans for incomplete scans to filter out
@@ -32,6 +36,10 @@ def get_data(filename):
     return data
 
 class PoseGraphOptimization(g2o.SparseOptimizer):
+    """
+    This is based off the g2opy sample code. It has methods to creature g2o edges and nodes
+    and run graph optimization on them.
+    """
     def __init__(self):
         super().__init__()
         solver = g2o.BlockSolverSE3(g2o.LinearSolverCholmodSE3())
@@ -69,23 +77,30 @@ class PoseGraphOptimization(g2o.SparseOptimizer):
         return self.vertex(id).estimate()
 
     def make_graph(self, data):
-        lidar = data['scans']
-        odom = data['odom']
+        """
+        This is the method we added. It takes data in the dictionary format we recorded, and
+        turns it into g2o edges and nodes.
+        """
+        lidar = data['scans'] # list of laser scan data
+        odom = data['odom'] # list of odom data
+        closure = data['closures'] # index of loop closure scan in laser scans
         i = -1
-        # Loop through lidar
-        for k,scan in enumerate(lidar):
-            for point in scan:
+        # Loop through lidar data and add each measured point as a vertex
+        for k,scan in enumerate(lidar): # loop through each scan
+            for point in scan: # loop through each point in each scan
                 i = i+1
-                # q = g2o.Quaternion(0,0,0,0)
+                # t is the pose estimate of the scanned point
                 t = g2o.Isometry3d(np.identity(3),[point[0], point[1], 0])
                 self.add_vertex(i, t)
 
-        vertices = super().vertices()
+        vertices = super().vertices() # save all the laser scan vertices to a variable we can use later
         print(len(vertices))
-        # Loop through odom points
+
+        # Loop through odom points and add them as vertices. Then, add edges between the odom point and each point in the most
+        # recent laser scan.
         for f, point in enumerate(odom):
             # End the loop if there are more odom points than LiDAR, since we are only keeping even values
-            if f > len(lidar):
+            if f > len(lidar): # just in case, stop when you have an odom point for each laser scan. otherwise the indexes won't match
                 break
             i = i+1
             # Add odom vertices
@@ -100,7 +115,6 @@ class PoseGraphOptimization(g2o.SparseOptimizer):
                 self.add_edge([i, x], diff)
 
         # Add edge from loop closures
-        closure = data['closures']
         diff = g2o.Isometry3d(np.identity(3)*5, [0,0,0])
         self.add_edge([closure[0], closure[1]], diff)
 
@@ -111,7 +125,7 @@ if __name__ == '__main__':
     data = get_data('data_4')
     opt = PoseGraphOptimization()
     opt.make_graph(data)
-    opt.save('og1.g2o')
+    opt.save('og1.g2o') #save a g2o file of the data before optimization
     opt.optimize()
-    opt.save('yay1.g2o')
+    opt.save('yay1.g2o') #save a g2o file of the data after optimization
 68230
