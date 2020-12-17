@@ -51,11 +51,13 @@ class PoseGraphOptimization(g2o.SparseOptimizer):
         odom = data['odom']
         for scan in lidar:
             for i,point in enumerate(scan):
-                self.add_vertex(i, point)
+                t = g2o.Isometry3d(point[0][0], point[0][1], point[0][2])
+                self.add_vertex(i, t)
         for f, point in enumerate(odom):
             if f % 2 == 0:
                 i = i+1
-                self.add_vertex(i, point)
+                t = g2o.Isometry3d(point[0][0], point[0][1], point[0][2])
+                self.add_vertex(i, t)
         print('num vertices:', len(super().vertices()))
 
 

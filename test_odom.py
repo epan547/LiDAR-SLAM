@@ -229,9 +229,9 @@ class NeatoController():
             #print(" x : %f  y: %f  z: %f" %(p[0],p[1],p[2]))
             current_mapx.append(p[0])
             current_mapy.append(p[1])
-            point = Point(p[0],p[1],p[2])
-            quat = Quaternion(0,0,0,0)
-            pose_array.append(Pose(point, quat))
+            point = (p[0],p[1],p[2])
+            quat = (0,0,0,0)
+            pose_array.append([point, quat])
         self.data["scans"].append(pose_array)
         self.map_x.append(current_mapx)
         self.map_y.append(current_mapy)
@@ -251,7 +251,7 @@ class NeatoController():
         self.map_neatox.append(self.x)
         self.map_neatoy.append(self.y)
 
-        self.data["odom"].append(msg.pose.pose)
+        self.data["odom"].append([(self.x, self.y, 0), (0,0,0,0)])
 
         distance = np.sqrt((self.x - self.init_x)**2 + (self.y - self.init_y)**2)
 
