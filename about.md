@@ -74,7 +74,7 @@ nav-menu: true
 				<header class="major">
 					<h3>After ICP</h3>
 				</header>
-				<p>With a set of measurements and a loop closure, we were able to feed our data into g2opy, a python library built for graph optimization for SLAM. The results were... uninspiring.</p>
+				<p>After calculating the transform between two scans using ICP, we applied the transform to the original scan, and plotted before/after the transform for comparison. We tuned the number of iterations to give us the figure you see on the right.</p>
 			</div>
 		</div>
 	</section>
