@@ -1,7 +1,7 @@
 ---
-title: About
+title: Landing
 layout: landing
-description: 'About this project'
+description: 'Lorem ipsum dolor sit amet nullam consequa<br />sed veroeros. tempus adipiscing nulla.'
 image: assets/images/pic07.jpg
 nav-menu: true
 ---
@@ -10,20 +10,30 @@ nav-menu: true
 <div id="main">
 
 <!-- One -->
-<section id="One">
+<section id="one">
+	<div class="inner">
+		<header class="major">
+			<h2>Sed amet aliquam</h2>
+		</header>
+		<p>Nullam et orci eu lorem consequat tincidunt vivamus et sagittis magna sed nunc rhoncus condimentum sem. In efficitur ligula tate urna. Maecenas massa vel lacinia pellentesque lorem ipsum dolor. Nullam et orci eu lorem consequat tincidunt. Vivamus et sagittis libero. Nullam et orci eu lorem consequat tincidunt vivamus et sagittis magna sed nunc rhoncus condimentum sem. In efficitur ligula tate urna.</p>
+	</div>
+</section>
+
+<!-- One -->
+<!-- <section id="One">
 	<div class="inner">
 		<header class="major">
 			<h2>2D LiDAR Based SLAM</h2>
 		</header>
 		<p>The goal of our project was to implement a basic SLAM alorithm using a physical Neato from Olin. SLAM is a class of algorithms for simultaneously mapping an area and locating the robot within that map. We used the Neato's built-in LiDAR and wheel encoders to sense the environment, and a method called Graph Optimization to map it.</p>
 	</div>
-</section>
+</section> -->
 
 <!-- Two -->
 <section id="Two" class="spotlights">
 	<section>
-		<a href="generic.html" class="image">
-			<img src="{% link assets/images/Driffft.png %}" alt="" data-position="center center" />
+		<a href="#" class="image">
+			<img src="{% link assets/images/drift.png %}" alt="" data-position="center center" />
 		</a>
 		<div class="content">
 			<div class="inner">
@@ -52,7 +62,7 @@ nav-menu: true
 	</section>
 	<section>
 		<a href="generic.html" class="image">
-			<img src="{% link assets/images/labelled_icp_transform.png %}" alt="" data-position="25% 25%" />
+			<img src="./assets/images/labelled_icp_transform.png" alt="" data-position="25% 25%" />
 		</a>
 		<div class="content">
 			<div class="inner">
